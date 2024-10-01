@@ -1,0 +1,104 @@
+---
+title: "p8105_hw2_yh3683"
+author: "Yining He"
+date: "2024-10-01"
+output: github_document
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+## Problem 1
+```{r}
+nyc_subway_data = read_csv("NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
+
+nyc_subway_data =janitor::clean_names(nyc_subway_data)
+
+colnames(nyc_subway_data)
+
+cleaned_data <- nyc_subway_data %>%
+  select(line, station_name, station_latitude, station_longitude, route1, route2, route3, route4, route5, route6, route7, entry, vending, entrance_type, ada) %>%
+  mutate(
+    entry = ifelse(entry == "YES", TRUE, FALSE)  
+  )
+```
+
+```{r}
+view(cleaned_data)
+```
+#### Describe about the cleaned dataset:
+**The dataset contains NYC subway station information, including line, station name, latitude/longitude, routes(Route1-Route7), entry status, vending, entrance type, and ADA compliance.** 
+
+**Data cleaning involved standardizing column names, selecting relevant variables, and converting the entry variable to a logical TRUE/FALSE format. The cleaned dataset has 1,868 rows and 15 columns, and with each row representing a unique station entrance or exit.**
+
+**But I don't think is tidy enough, because it still have many missing data (NA).**
+
+```{r echo=TRUE}
+distinct_stations <- cleaned_data %>% 
+  distinct(station_name, line) 
+
+n_distinct_stations <- nrow(distinct_stations)
+n_distinct_stations
+
+```
+**The number of distinct stations are 465**
+
+```{r echo=TRUE}
+ada_compliant_stations <- cleaned_data %>%
+  filter(ada == TRUE) %>%
+  distinct(station_name, line)
+
+n_ada_compliant_stations <- nrow(ada_compliant_stations)
+
+n_ada_compliant_stations
+```
+**There are 84 ADA compliant stations.**
+
+
+```{r}
+no_vending_entrances <- cleaned_data %>%
+  filter(vending == "NO")
+
+proportion_allowing_entrance <- mean(no_vending_entrances$entry)
+proportion_allowing_entrance
+```
+**The proportion of station entrances / exits without vending allow entrance is about 37.70.**
+
+#### reform the data
+```{r}
+reformatted_data <- cleaned_data %>%
+  pivot_longer(cols = starts_with("route"), 
+               names_to = "route_number", 
+               values_to = "route_name") %>%
+  filter(!is.na(route_name)) 
+
+```
+
+#### the number of distinct stations that serve the A train
+```{r}
+a_train_stations <- reformatted_data %>%
+  filter(route_name == "A") %>%
+  distinct(station_name, line)
+
+n_a_train_stations <- nrow(a_train_stations)
+n_a_train_stations
+
+```
+**There are 60 distinct stations serve the A train**
+
+
+```{r}
+# Filter for ADA-compliant stations that serve the A train
+ada_a_train_stations <- reformatted_data %>%
+  filter(route_name == "A", ada == TRUE) %>%
+  distinct(station_name, line)
+
+n_ada_a_train_stations <- nrow(ada_a_train_stations)
+
+n_ada_a_train_stations
+
+```
+**There are 17 stations that serve the A train are ADA compliant.**
+
