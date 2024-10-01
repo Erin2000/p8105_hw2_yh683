@@ -7,10 +7,11 @@ output: github_document
 
 ```{r}
 library(tidyverse)
+library(dplyr)
 ```
 
 
-## Problem 1
+# Problem 1
 ```{r}
 nyc_subway_data = read_csv("NYC_Transit_Subway_Entrance_And_Exit_Data.csv")
 
@@ -101,4 +102,77 @@ n_ada_a_train_stations
 
 ```
 **There are 17 stations that serve the A train are ADA compliant.**
+
+# Problem 2
+
+#### clean the Mr. Trash Wheel sheet
+
+```{r}
+
+mr_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+                                  sheet = 1,   
+                                  skip = 1) %>%  
+  janitor::clean_names()  
+
+colnames(mr_trash_wheel_data)
+
+mr_trash_wheel_data <- mr_trash_wheel_data %>%
+  filter(!is.na(dumpster))
+
+mr_trash_wheel_data <- mr_trash_wheel_data %>%
+  mutate(sports_balls = as.integer(round(sports_balls)))
+mr_trash_wheel_data <- mr_trash_wheel_data %>%
+  select(-x15, -x16)
+
+view(mr_trash_wheel_data)
+```
+#### clean theProfessor Trash Wheel sheet
+```{r}
+professor_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+                                         sheet = 2,   
+                                         skip = 1) %>%  
+  janitor::clean_names()  
+
+colnames(professor_trash_wheel_data)
+
+professor_trash_wheel_data <- professor_trash_wheel_data %>%
+  filter(!is.na(dumpster))
+
+view(professor_trash_wheel_data)
+
+#no sports balls column
+```
+
+#### clean the gwynnda_trash_wheel Wheel sheet
+
+```{r}
+gwynnda_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+                                       sheet = 4,   
+                                       skip = 1) %>%  
+  janitor::clean_names()  
+colnames(gwynnda_trash_wheel_data)
+gwynnda_trash_wheel_data <- gwynnda_trash_wheel_data %>%
+  filter(!is.na(dumpster))
+
+view(gwynnda_trash_wheel_data)
+
+#no sports_balls and glass bottles
+```
+#### creat a new data sheet
+
+If we want to make a new table i should add a "sports_ball" column in professor_trash_wheel_data table and add "lass_bottles" "sports_balls" in gwynnda_trash_wheel_data table.
+```{r}
+professor_trash_wheel_data <- professor_trash_wheel_data %>%
+  mutate(sports_balls = NA)
+
+gwynnda_trash_wheel_data <- gwynnda_trash_wheel_data %>%
+  mutate(glass_bottles = NA, sports_balls = NA)
+
+view(combined_trash_wheel_data)
+```
+
+
+
+
+
 
