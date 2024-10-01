@@ -160,7 +160,7 @@ view(gwynnda_trash_wheel_data)
 ```
 #### creat a new data sheet
 
-If we want to make a new table i should add a "sports_ball" column in professor_trash_wheel_data table and add "lass_bottles" "sports_balls" in gwynnda_trash_wheel_data table.
+If we want to make a new table i should add a "sports_ball" column in professor_trash_wheel_data table and add "lass_bottles" "sports_balls" in gwynnda_trash_wheel_data table
 ```{r}
 professor_trash_wheel_data <- professor_trash_wheel_data %>%
   mutate(sports_balls = NA)
