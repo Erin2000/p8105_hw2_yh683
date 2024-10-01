@@ -188,6 +188,14 @@ view(combined_trash_wheel_data)
 
 ```
 
+Description of the new dataset:
+
+The combined_trash_wheel_data combines data from the three sources: Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. 
+The dataset contains 1,033 rows and 14 columns.
+Key variables in the dataset include weight_tons, which records the weight of trash collected in tons, and volume_cubic_yards, representing the volume of trash collected in cubic yards. Additionally, the dataset contains variables like plastic_bottles (number of plastic bottles collected), cigarette_butts, and sports_balls, though some columns such as sports_balls and glass_bottles were missing from certain sources and have been filled with NA values where applicable.The variables sports_balls and glass_bottles were added to datasets that didn’t originally have them, with missing data represented as NA.
+
+
+
 
 #### The total weight of trash collected by Professor Trash Wheel
 ```{r}
