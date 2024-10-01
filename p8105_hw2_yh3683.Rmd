@@ -8,6 +8,8 @@ output: github_document
 ```{r}
 library(tidyverse)
 library(dplyr)
+library(readxl)
+
 ```
 
 
@@ -109,7 +111,7 @@ n_ada_a_train_stations
 
 ```{r}
 
-mr_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+mr_trash_wheel_data <- read_excel("202409 Trash Wheel Collection Data.xlsx", 
                                   sheet = 1,   
                                   skip = 1) %>%  
   janitor::clean_names()  
@@ -126,9 +128,11 @@ mr_trash_wheel_data <- mr_trash_wheel_data %>%
 
 view(mr_trash_wheel_data)
 ```
+
+
 #### clean theProfessor Trash Wheel sheet
 ```{r}
-professor_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+professor_trash_wheel_data <- read_excel("202409 Trash Wheel Collection Data.xlsx", 
                                          sheet = 2,   
                                          skip = 1) %>%  
   janitor::clean_names()  
@@ -146,7 +150,7 @@ view(professor_trash_wheel_data)
 #### clean the gwynnda_trash_wheel Wheel sheet
 
 ```{r}
-gwynnda_trash_wheel_data <- read_excel("202309 Trash Wheel Collection Data.xlsx", 
+gwynnda_trash_wheel_data <- read_excel("202409 Trash Wheel Collection Data.xlsx", 
                                        sheet = 4,   
                                        skip = 1) %>%  
   janitor::clean_names()  
@@ -160,16 +164,59 @@ view(gwynnda_trash_wheel_data)
 ```
 #### creat a new data sheet
 
-If we want to make a new table i should add a "sports_ball" column in professor_trash_wheel_data table and add "lass_bottles" "sports_balls" in gwynnda_trash_wheel_data table
+If we want to make a new table i should add a "sports_ball" column in professor_trash_wheel_data table and add "lass_bottles" "sports_balls" in gwynnda_trash_wheel_data table.
+
 ```{r}
+mr_trash_wheel_data <- mr_trash_wheel_data %>%
+  mutate(year = as.character(year))
+
+professor_trash_wheel_data <- professor_trash_wheel_data %>%
+  mutate(year = as.character(year))
+
+gwynnda_trash_wheel_data <- gwynnda_trash_wheel_data %>%
+  mutate(year = as.character(year))
+
 professor_trash_wheel_data <- professor_trash_wheel_data %>%
   mutate(sports_balls = NA)
 
 gwynnda_trash_wheel_data <- gwynnda_trash_wheel_data %>%
   mutate(glass_bottles = NA, sports_balls = NA)
 
+combined_trash_wheel_data <- bind_rows(mr_trash_wheel_data, professor_trash_wheel_data, gwynnda_trash_wheel_data)
+
 view(combined_trash_wheel_data)
+
 ```
+
+
+#### The total weight of trash collected by Professor Trash Wheel
+```{r}
+total_weight_professor <- professor_trash_wheel_data %>%
+  summarise(total_weight_tons = sum(weight_tons, na.rm = TRUE))
+
+total_weight_professor
+```
+The total weight is 246.75 tons.
+
+#### The total number of cigarette butts collected by Gwynnda in June of 2022
+```{r}
+total_cigarette_butts_gwynnda_june_2022 <- gwynnda_trash_wheel_data %>%
+  filter(month == "June", year == "2022") %>%
+  summarise(total_cigarette_butts = sum(cigarette_butts, na.rm = TRUE))
+
+total_cigarette_butts_gwynnda_june_2022
+
+```
+The total number of cigarette is 18120 butts.
+
+
+# Problem3
+
+
+
+
+
+
 
 
 
