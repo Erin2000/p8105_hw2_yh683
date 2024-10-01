@@ -220,6 +220,14 @@ The total number of cigarette is 18120 butts.
 
 # Problem3
 
+```{r}
+result = read_csv("result.csv")
+bakes = read_csv("bakes.csv")
+bakers = read_csv("bakers.csv")
+result =janitor::clean_names(result)
+bakes =janitor::clean_names(bakes)
+bakers =janitor::clean_names(bakers)
+```
 
 
 
