@@ -187,6 +187,7 @@ total_weight_professor <- professor_trash_wheel_data %>%
 The total weight is `r total_weight_professor` tons.
 
 ```{r include=FALSE}
+options(scipen = 999)
 total_cigarette_butts_gwynnda_june_2022 <- gwynnda_trash_wheel_data %>%
   filter(month == "June", year == "2022") %>%
   summarise(total_cigarette_butts = sum(cigarette_butts, na.rm = TRUE))
@@ -308,34 +309,21 @@ viewers <- read.csv("viewers.csv")|>
 colnames(viewers)
 head(viewers, 10)
 
+viewers_long <- viewers %>%
+  select(episode, starts_with("series")) %>%  # Adjusted column selection
+  pivot_longer(
+    cols = starts_with("series"),
+    names_to = c(".value","Series"),
+    names_pattern = "(series_)(\\d+)" 
+  ) %>% mutate(viewership = series_)
+mean <- viewers_long %>% group_by(episode) %>%
+  summarise(mean=mean(viewership,na.rm=T)) %>%
+  filter(episode == 1 | episode == 5)
 
 ```
-```{r}
-# I will make the NA as 0.00 to calculate the average viewership
-numeric_conversion <- function(x) {
-  if (is.numeric(x)) {
-    x_numeric <- x  
-  } else if (is.character(x) || is.factor(x)) {
-    x_numeric <- as.numeric(as.character(x))  
-  } else {
-    x_numeric <- rep(0, length(x))  
-  }
-  x_numeric[is.na(x_numeric)] <- 0  
-  return(x_numeric)
-}
-viewers_numeric <- as.data.frame(lapply(viewers, numeric_conversion))
-colnames(viewers_numeric) <- make.names(colnames(viewers_numeric), unique=TRUE)
-print(colnames(viewers_numeric))
+The average viewership in Season 1 is `r mean %>% filter(episode == 1)`.
 
-avg_season1 <- mean(viewers_numeric$Series.1, na.rm = TRUE)
-avg_season5 <- mean(viewers_numeric$Series.5, na.rm = TRUE)
-
-cat("The average viewership in Season 1 is:", avg_season1, "\n")
-cat("The average viewership in Season 5 is:", avg_season5, "\n")
-```
-The average viewership in Season 1 is `r avg_season1`.
-
-The average viewership in Season 5 is `r avg_season5`.
+The average viewership in Season 5 is `r mean %>% filter(episode == 5)`.
 
 
 
