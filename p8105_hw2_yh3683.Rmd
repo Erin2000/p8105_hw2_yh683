@@ -33,42 +33,35 @@ cleaned_data <- nyc_subway_data %>%
 view(cleaned_data)
 ```
 #### Describe about the cleaned dataset:
-**The dataset contains NYC subway station information, including line, station name, latitude/longitude, routes(Route1-Route7), entry status, vending, entrance type, and ADA compliance.** 
+The dataset contains NYC subway station information, including line, station name, latitude/longitude, routes(Route1-Route7), entry status, vending, entrance type, and ADA compliance.
 
-**Data cleaning involved standardizing column names, selecting relevant variables, and converting the entry variable to a logical TRUE/FALSE format. The cleaned dataset has 1,868 rows and 15 columns, and with each row representing a unique station entrance or exit.**
+Data cleaning involved standardizing column names, selecting relevant variables, and converting the entry variable to a logical TRUE/FALSE format. The cleaned dataset has 1,868 rows and 15 columns, and with each row representing a unique station entrance or exit.**
 
-**But I don't think is tidy enough, because it still have many missing data (NA).**
+But I don't think is tidy enough, because it still have many missing data (NA).
 
-```{r echo=TRUE}
+```{r include=FALSE}
 distinct_stations <- cleaned_data %>% 
   distinct(station_name, line) 
-
 n_distinct_stations <- nrow(distinct_stations)
-n_distinct_stations
-
 ```
-**The number of distinct stations are 465**
+The number of distinct stations are `r n_distinct_stations `
 
-```{r echo=TRUE}
+```{r include=FALSE}
 ada_compliant_stations <- cleaned_data %>%
   filter(ada == TRUE) %>%
   distinct(station_name, line)
 
 n_ada_compliant_stations <- nrow(ada_compliant_stations)
-
-n_ada_compliant_stations
 ```
-**There are 84 ADA compliant stations.**
+There are `r n_ada_compliant_stations` ADA compliant stations.
 
 
-```{r}
+```{r include=FALSE}
 no_vending_entrances <- cleaned_data %>%
   filter(vending == "NO")
-
 proportion_allowing_entrance <- mean(no_vending_entrances$entry)
-proportion_allowing_entrance
 ```
-**The proportion of station entrances / exits without vending allow entrance is about 37.70.**
+The proportion of station entrances / exits without vending allow entrance is about `r proportion_allowing_entrance`.
 
 #### reform the data
 ```{r}
@@ -80,31 +73,22 @@ reformatted_data <- cleaned_data %>%
 
 ```
 
-#### the number of distinct stations that serve the A train
-```{r}
+```{r include=FALSE}
 a_train_stations <- reformatted_data %>%
   filter(route_name == "A") %>%
   distinct(station_name, line)
-
 n_a_train_stations <- nrow(a_train_stations)
-n_a_train_stations
-
 ```
-**There are 60 distinct stations serve the A train**
+There are `r n_a_train_stations` distinct stations serve the A train
 
-
-```{r}
+```{r include=FALSE}
 # Filter for ADA-compliant stations that serve the A train
 ada_a_train_stations <- reformatted_data %>%
   filter(route_name == "A", ada == TRUE) %>%
   distinct(station_name, line)
-
 n_ada_a_train_stations <- nrow(ada_a_train_stations)
-
-n_ada_a_train_stations
-
 ```
-**There are 17 stations that serve the A train are ADA compliant.**
+There are `r n_ada_a_train_stations` stations that serve the A train are ADA compliant.
 
 # Problem 2
 
@@ -133,6 +117,7 @@ view(mr_trash_wheel_data)
 
 #### clean theProfessor Trash Wheel sheet
 ```{r}
+#import data file
 professor_trash_wheel_data <- read_excel("202409 Trash Wheel Collection Data.xlsx", 
                                          sheet = 2,   
                                          skip = 1) %>%  
@@ -192,31 +177,22 @@ view(combined_trash_wheel_data)
 Description of the new dataset:
 
 The combined_trash_wheel_data combines data from the three sources: Mr. Trash Wheel, Professor Trash Wheel, and Gwynnda Trash Wheel. 
-The dataset contains 1,033 rows and 14 columns.
+The dataset contains`r nrow(combined_trash_wheel_data)` rows and `r ncol(combined_trash_wheel_data)` columns.
 Key variables in the dataset include weight_tons, which records the weight of trash collected in tons, and volume_cubic_yards, representing the volume of trash collected in cubic yards. Additionally, the dataset contains variables like plastic_bottles (number of plastic bottles collected), cigarette_butts, and sports_balls, though some columns such as sports_balls and glass_bottles were missing from certain sources and have been filled with NA values where applicable.The variables sports_balls and glass_bottles were added to datasets that didn’t originally have them, with missing data represented as NA.
 
-
-
-
-#### The total weight of trash collected by Professor Trash Wheel
-```{r}
+```{r include=FALSE}
 total_weight_professor <- professor_trash_wheel_data %>%
   summarise(total_weight_tons = sum(weight_tons, na.rm = TRUE))
-
-total_weight_professor
 ```
-The total weight is 246.75 tons.
+The total weight is `r total_weight_professor` tons.
 
-#### The total number of cigarette butts collected by Gwynnda in June of 2022
-```{r}
+```{r include=FALSE}
 total_cigarette_butts_gwynnda_june_2022 <- gwynnda_trash_wheel_data %>%
   filter(month == "June", year == "2022") %>%
   summarise(total_cigarette_butts = sum(cigarette_butts, na.rm = TRUE))
-
-total_cigarette_butts_gwynnda_june_2022
-
 ```
-The total number of cigarette is 18120 butts.
+The total number of cigatette butts is `r total_cigarette_butts_gwynnda_june_2022` butts.
+
 
 
 # Problem3
@@ -280,8 +256,97 @@ final_data <- bakeresults |>
   arrange(series, episode, baker)
 
 view(final_data)
+
+write_csv(final_data, "final_data.csv")
 ```
 
+Describe your data cleaning process:
+In the data cleaning process, we started by importing the results, bakes, and bakers datasets, deleting the first two rows of results.csv, and using janitor::clean_names() to standardize column names. We ensured consistency across the datasets by converting series and episode columns to numeric and renaming the baker column in bakers to match the others. We also extracted first names from the baker column to ensure uniformity across datasets. To check for completeness, we used anti_join() to identify unmatched records between results and bakers. After confirming the data consistency, we merged results with bakers and then merged the result with bakes, selecting relevant columns and sorting the final dataset by series, episode, and baker for meaningful organization. Finally, the cleaned dataset was saved as final_data.csv.
+
+Question:
+However, I encountered several issues during the data cleaning process. For example, after using mutate(), an extra column baker_name appeared, or when I didn’t apply janitor::clean_names() initially, the Hometown and Occupation columns showed as NA.
+
+Briefly discuss the final dataset:
+The final dataset merges information about bakers, episodes, and their performance. It organizes bakers' demographic data (age, occupation, hometown) along with their performance data from different baking challenges. The dataset still have some misssing values in different columns.
+
+#### create a eader-friendly table 
+
+```{r}
+final_data <- final_data %>%
+  mutate(result = str_trim(result)) %>% 
+  filter(result %in% c("Star Baker", "Winner", "STAR BAKER", "WINNER"))
+
+star_bakers_winners <- final_data %>%
+  filter(series >= 5 & series <= 10) %>%
+  arrange(series, episode) %>%
+  select(series, episode, baker, baker_age, baker_occupation, hometown, signature_bake, show_stopper, technical, result)
+
+view(star_bakers_winners)
+```
+
+```{r}
+hometown_star_baker <- star_bakers_winners %>%
+  filter(result %in% c("Star Baker", "STAR BAKER")) %>% 
+  count(hometown, sort = TRUE) %>% 
+  slice_max(n = 1, order_by = n)
+hometown_star_baker
+```
+We found that most of the Star Bakers are from London, but there isn't a single winner from there.
+
+```{r}
+winners_table <- star_bakers_winners %>%
+  mutate(result = str_trim(result)) %>% 
+  filter(result %in% c("Winner", "WINNER")) %>%  
+  select(series, episode, baker, baker_age, baker_occupation, hometown, signature_bake, show_stopper, result)
+winners_table
+```
+Through observing all the winners from Seasons 5 to 10, most of the winners were female, with the majority falling within the 30-40 age range. However, their professions were quite surprising, coming from various industries, including a PE teacher and an international health adviser. I think it's still quite difficult to predict the winner.
+
+```{r}
+viewers <- read.csv("viewers.csv")|>
+  janitor::clean_names()
+colnames(viewers)
+head(viewers, 10)
+
+
+```
+```{r}
+# I will make the NA as 0.00 to calculate the average viewership
+numeric_conversion <- function(x) {
+  if (is.numeric(x)) {
+    x_numeric <- x  
+  } else if (is.character(x) || is.factor(x)) {
+    x_numeric <- as.numeric(as.character(x))  
+  } else {
+    x_numeric <- rep(0, length(x))  
+  }
+  x_numeric[is.na(x_numeric)] <- 0  
+  return(x_numeric)
+}
+viewers_numeric <- as.data.frame(lapply(viewers, numeric_conversion))
+colnames(viewers_numeric) <- make.names(colnames(viewers_numeric), unique=TRUE)
+print(colnames(viewers_numeric))
+
+avg_season1 <- mean(viewers_numeric$Series.1, na.rm = TRUE)
+avg_season5 <- mean(viewers_numeric$Series.5, na.rm = TRUE)
+
+cat("The average viewership in Season 1 is:", avg_season1, "\n")
+cat("The average viewership in Season 5 is:", avg_season5, "\n")
+```
+The average viewership in Season 1 is `r avg_season1`.
+
+The average viewership in Season 5 is `r avg_season5`.
+
+
+
+
+
+
+
+
+
+
+ 
 
 
 
