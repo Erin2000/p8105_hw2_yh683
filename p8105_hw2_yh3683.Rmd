@@ -268,9 +268,9 @@ Question:
 However, I encountered several issues during the data cleaning process. For example, after using mutate(), an extra column baker_name appeared, or when I didn’t apply janitor::clean_names() initially, the Hometown and Occupation columns showed as NA.
 
 Briefly discuss the final dataset:
-The final dataset merges information about bakers, episodes, and their performance. It organizes bakers' demographic data (age, occupation, hometown) along with their performance data from different baking challenges. The dataset still have some misssing values in different columns.
+The final dataset merges information have 1136 entries and 10 columns,which includes bakers, episodes, and their performance. It organizes bakers' demographic data (age, occupation, hometown) along with their performance data from different baking challenges. The dataset still have some misssing values in different columns.
 
-#### create a eader-friendly table 
+#### create a reader-friendly table 
 
 ```{r}
 final_data <- final_data %>%
@@ -303,27 +303,17 @@ winners_table
 ```
 Through observing all the winners from Seasons 5 to 10, most of the winners were female, with the majority falling within the 30-40 age range. However, their professions were quite surprising, coming from various industries, including a PE teacher and an international health adviser. I think it's still quite difficult to predict the winner.
 
+
+#### viewership
 ```{r}
 viewers <- read.csv("viewers.csv")|>
   janitor::clean_names()
 colnames(viewers)
 head(viewers, 10)
-
-viewers_long <- viewers %>%
-  select(episode, starts_with("series")) %>%  # Adjusted column selection
-  pivot_longer(
-    cols = starts_with("series"),
-    names_to = c(".value","Series"),
-    names_pattern = "(series_)(\\d+)" 
-  ) %>% mutate(viewership = series_)
-mean <- viewers_long %>% group_by(episode) %>%
-  summarise(mean=mean(viewership,na.rm=T)) %>%
-  filter(episode == 1 | episode == 5)
-
 ```
-The average viewership in Season 1 is `r mean %>% filter(episode == 1)`.
+The average viewership in Season 1 is `r mean(viewers$series_1,na.rm=T)`.
 
-The average viewership in Season 5 is `r mean %>% filter(episode == 5)`.
+The average viewership in Season 5 is `r mean(viewers$series_5,na.rm=T)`.
 
 
 
